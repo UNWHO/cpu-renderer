@@ -1,44 +1,89 @@
-pub mod math;
+mod graphic;
+mod math;
 mod utils;
 
+use std::convert::TryInto;
+
+use graphic::{fragment::Fragment, rasterize, vertex::Vertex};
 use js_sys::Uint8ClampedArray;
-use math::vector::Vector4;
+
+use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+extern "C" {
+    fn log(s: &str);
+}
 
 static mut WIDTH: usize = 1280;
 static mut HEIGHT: usize = 720;
-static mut buffer: Vec<u8> = Vec::new();
-static mut color_index: usize = 0;
-
-const RED: Vector4<u8> = Vector4::const_from([[255, 0, 0, 255]]);
-const GREEN: Vector4<u8> = Vector4::const_from([[0, 255, 0, 255]]);
-const BLUE: Vector4<u8> = Vector4::const_from([[0, 0, 255, 255]]);
-const COLORS: [&Vector4<u8>; 3] = [&RED, &GREEN, &BLUE];
+static mut frame_buffer: Vec<u8> = Vec::new();
 
 #[wasm_bindgen]
 pub fn set_frame_size(width: usize, height: usize) {
     unsafe {
         WIDTH = width;
         HEIGHT = height;
-        buffer.resize(WIDTH * HEIGHT * 4, 0);
+        frame_buffer.resize(WIDTH * HEIGHT * 4, 0);
     }
 }
 
 #[wasm_bindgen]
-pub fn render_loop() -> Uint8ClampedArray {
+pub fn render() -> Uint8ClampedArray {
     unsafe {
-        for i in 0..WIDTH {
-            for j in 0..HEIGHT {
-                let color = COLORS[color_index];
-                color_index = (color_index + 1) % 3;
+        // let vertices = vertex_shader(
+        //     &mut triangle,
+        //     &model_matrix
+        //         .mul(&view_matrix)
+        //         .mul(&view_matrix)
+        //         .mul(&projection_matrix),
+        // );
+        // render(WIDTH, HEIGHT, &mut buffer);
 
-                buffer[j * WIDTH * 4 + i * 4] = color.x();
-                buffer[j * WIDTH * 4 + i * 4 + 1] = color.y();
-                buffer[j * WIDTH * 4 + i * 4 + 2] = color.z();
-                buffer[j * WIDTH * 4 + i * 4 + 3] = color.w();
-            }
-        }
-
-        Uint8ClampedArray::view(&buffer)
+        Uint8ClampedArray::view(&frame_buffer)
     }
+}
+
+#[wasm_bindgen]
+pub fn draw_triangle(pos: &[f64], color: &[f64]) {
+    let mut triangle: Vec<Vertex> = vec![];
+    for i in 0..3 {
+        triangle.push(Vertex::from_array(
+            &pos[i * 3..i * 3 + 3]
+                .try_into()
+                .expect("Invalid vertex position"),
+            &color[i * 4..i * 4 + 4]
+                .try_into()
+                .expect("Invalid vertex color"),
+        ))
+    }
+
+    unsafe {
+        // let mut vertices: Vec<Vertex> = triangle
+        //     .iter()
+        //     .map(|vertex| vertex_shader(vertex, &mvp_matrix))
+        //     .collect();
+
+        let mut fragments: Vec<Fragment> = rasterize(&triangle, WIDTH, HEIGHT);
+        fragments.iter().for_each(|fragment| {
+            let index = (fragment.pos.y() * WIDTH + fragment.pos.x()) * 4;
+
+            frame_buffer[index] = (fragment.color.x() * 255.0) as u8;
+            frame_buffer[index + 1] = (fragment.color.y() * 255.0) as u8;
+            frame_buffer[index + 2] = (fragment.color.z() * 255.0) as u8;
+            frame_buffer[index + 3] = (fragment.color.w() * 255.0) as u8;
+        });
+    }
+}
+
+#[wasm_bindgen]
+pub fn clear_buffer() {
+    unsafe {
+        frame_buffer.fill(255);
+    }
+}
+
+#[wasm_bindgen(start)]
+pub fn init() {
+    set_panic_hook()
 }

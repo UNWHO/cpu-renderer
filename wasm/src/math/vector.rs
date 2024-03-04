@@ -18,6 +18,20 @@ impl<T: Number, const S: usize> Vector<T, S> {
 
         sum
     }
+
+    pub fn mul_matrix(&mut self, matrix: &Matrix<T, S, S>) -> &mut Self {
+        for i in 0..S {
+            let mut sum = T::zero();
+
+            for j in 0..S {
+                sum += matrix[i][j] * self[0][j]
+            }
+
+            self[0][i] = sum
+        }
+
+        self
+    }
 }
 
 impl<T: Number> Vector2<T> {
@@ -38,11 +52,25 @@ impl<T: Number> Vector3<T> {
             self.x() * rhs.y() - self.y() * rhs.x(),
         ]])
     }
+
+    pub fn to_homogeneous(&self) -> Vector4<T> {
+        Vector4::<T>::from(&[[self.x(), self.y(), self.z(), T::one()]])
+    }
 }
 
 impl<T: Number> Vector4<T> {
     pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self::from(&[[x, y, z, w]])
+    }
+
+    pub fn from_homogeneous(&self) -> Vector3<T> {
+        assert_ne!(self[0][3], T::zero());
+
+        Vector3::<T>::from(&[[
+            self.x() / self.w(),
+            self.y() / self.w(),
+            self.z() / self.w(),
+        ]])
     }
 }
 

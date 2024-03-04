@@ -104,6 +104,12 @@ impl<T: Number, const S: usize> Matrix<T, S, S> {
     }
 }
 
+impl<T: Number, const R: usize, const C: usize> Clone for Matrix<T, R, C> {
+    fn clone(&self) -> Self {
+        Self { 0: self.0.clone() }
+    }
+}
+
 impl<T: Number, const R: usize, const C: usize> PartialEq for Matrix<T, R, C> {
     fn eq(&self, other: &Self) -> bool {
         for i in 0..R {
