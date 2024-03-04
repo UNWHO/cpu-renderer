@@ -3,7 +3,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use super::number::Number;
+use super::number::{zero, Number};
 
 pub struct Matrix<T: Number, const R: usize, const C: usize>([[T; R]; C]);
 
@@ -29,6 +29,12 @@ impl<T: Number, const R: usize, const C: usize> Matrix<T, R, C> {
 
     pub fn from(arr: &[[T; R]; C]) -> Self {
         Self { 0: arr.clone() }
+    }
+
+    pub fn zero() -> Self {
+        Self {
+            0: [[T::zero(); R]; C],
+        }
     }
 
     #[inline]
@@ -61,24 +67,40 @@ impl<T: Number, const R: usize, const C: usize> Matrix<T, R, C> {
         self
     }
 
-    pub fn mul(&mut self, rhs: &Matrix<T, C, R>) -> &mut Self {
+    pub fn mul_scala(&mut self, rhs: T) -> &mut Self {
         for i in 0..R {
             for j in 0..C {
-                self[j][i] *= rhs[j][i];
+                self[j][i] *= rhs;
             }
         }
 
         self
     }
 
-    pub fn div(&mut self, rhs: T) -> &mut Self {
-        for i in 0..R {
+    pub fn mul<const R2: usize>(&self, rhs: &Matrix<T, R2, R>) -> Matrix<T, C, R2> {
+        let mut result = Matrix::<T, C, R2>::zero();
+
+        for i in 0..R2 {
             for j in 0..C {
-                self[j][i] /= rhs;
+                for k in 0..R {
+                    result[j][i] += self[j][k] * rhs[k][i];
+                }
             }
         }
 
-        self
+        result
+    }
+}
+
+impl<T: Number, const S: usize> Matrix<T, S, S> {
+    pub fn identity() -> Self {
+        let mut zero = Self::zero();
+
+        for i in 0..S {
+            zero[i][i] = T::one();
+        }
+
+        zero
     }
 }
 
