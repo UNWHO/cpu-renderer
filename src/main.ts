@@ -8,6 +8,7 @@ import { Resolution, resolutionConfig } from "./resolution";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const select = document.getElementById("resolution") as HTMLSelectElement;
+const fps = document.getElementById("fps") as HTMLDivElement;
 
 const context = canvas.getContext("2d")!;
 
@@ -20,6 +21,8 @@ const colors = new Float64Array([
 
 let imageData = context.createImageData(canvas.width, canvas.height);
 let reqAnimFrameHandle: number;
+
+let previousTime = Date.now();
 
 select.oninput = () => {
   cancelAnimationFrame(reqAnimFrameHandle);
@@ -48,6 +51,11 @@ function loop() {
 
   imageData.data.set(render());
   context.putImageData(imageData, 0, 0);
+
+  let currentTime = Date.now();
+  let deltaTime = currentTime - previousTime;
+  fps.innerHTML = `${1000 / deltaTime}fps`;
+  previousTime = currentTime;
 
   reqAnimFrameHandle = requestAnimationFrame(loop);
 }
