@@ -32,6 +32,9 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Install wasm-pack
+        uses: cargo install wasm-pack
+
       - name: Install node dependencies
         run: npm i
 
