@@ -3,6 +3,7 @@ import {
   draw_triangle,
   render,
   set_frame_size,
+  set_mvp_matrix,
 } from "../wasm/pkg/cpu_renderer";
 import { Resolution, resolutionConfig } from "./resolution";
 
@@ -18,6 +19,8 @@ const vertices = new Float64Array([
 const colors = new Float64Array([
   1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
 ]);
+
+let theta = 0;
 
 let imageData = context.createImageData(canvas.width, canvas.height);
 let reqAnimFrameHandle: number;
@@ -47,6 +50,39 @@ function init() {
 
 function loop() {
   clear_buffer();
+
+  // rotate model around z-axis
+  theta += 0.5;
+  const rad = (theta * Math.PI) / 180;
+
+  const modelMatrix = [
+    [Math.cos(rad), -Math.sin(rad), 0, 0],
+    [Math.sin(rad), Math.cos(rad), 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+  ];
+
+  const viewMatrix = [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+  ];
+
+  const projMatrix = [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+  ];
+
+  const mvpMatrix = multiplyMatrix(
+    multiplyMatrix(modelMatrix, viewMatrix),
+    projMatrix
+  );
+
+  set_mvp_matrix(new Float64Array(mvpMatrix.flat()));
+
   draw_triangle(vertices, colors);
 
   imageData.data.set(render());
@@ -61,3 +97,17 @@ function loop() {
 }
 
 init();
+
+function multiplyMatrix(a: number[][], b: number[][]): number[][] {
+  const result = new Array(4).fill(null).map(() => new Array(4).fill(0));
+
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      for (let k = 0; k < 4; k++) {
+        result[j][i] += a[j][k] * b[k][i];
+      }
+    }
+  }
+
+  return result;
+}

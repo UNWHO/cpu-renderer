@@ -2,11 +2,13 @@ mod graphic;
 mod math;
 mod utils;
 
+use core::f64;
 use std::convert::TryInto;
 
-use graphic::{fragment::Fragment, rasterize, vertex::Vertex};
+use graphic::{fragment::Fragment, rasterize, vertex::Vertex, vertex_shader};
 use js_sys::Uint8ClampedArray;
 
+use math::matrix::Matrix;
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 
@@ -18,6 +20,12 @@ extern "C" {
 static mut WIDTH: usize = 1280;
 static mut HEIGHT: usize = 720;
 static mut frame_buffer: Vec<u8> = Vec::new();
+static mut mvp_matrix: Matrix<f64, 4, 4> = Matrix::<f64, 4, 4>::const_from([
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+]);
 
 #[wasm_bindgen]
 pub fn set_frame_size(width: usize, height: usize) {
@@ -59,12 +67,12 @@ pub fn draw_triangle(pos: &[f64], color: &[f64]) {
     }
 
     unsafe {
-        // let mut vertices: Vec<Vertex> = triangle
-        //     .iter()
-        //     .map(|vertex| vertex_shader(vertex, &mvp_matrix))
-        //     .collect();
+        let vertices: Vec<Vertex> = triangle
+            .iter()
+            .map(|vertex| vertex_shader(vertex, &mvp_matrix))
+            .collect();
 
-        let mut fragments: Vec<Fragment> = rasterize(&triangle, WIDTH, HEIGHT);
+        let mut fragments: Vec<Fragment> = rasterize(&vertices, WIDTH, HEIGHT);
         fragments.iter().for_each(|fragment| {
             let index = (fragment.pos.y() * WIDTH + fragment.pos.x()) * 4;
 
@@ -80,6 +88,17 @@ pub fn draw_triangle(pos: &[f64], color: &[f64]) {
 pub fn clear_buffer() {
     unsafe {
         frame_buffer.fill(255);
+    }
+}
+
+#[wasm_bindgen]
+pub fn set_mvp_matrix(matrix: &[f64]) {
+    unsafe {
+        for i in 0..4 {
+            for j in 0..4 {
+                mvp_matrix[j][i] = matrix[j * 4 + i];
+            }
+        }
     }
 }
 
