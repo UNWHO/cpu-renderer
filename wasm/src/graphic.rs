@@ -1,3 +1,4 @@
+pub mod buffer;
 pub mod color;
 pub mod fragment;
 pub mod vertex;

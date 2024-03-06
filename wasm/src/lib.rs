@@ -27,6 +27,8 @@ static mut mvp_matrix: Matrix<f64, 4, 4> = Matrix::<f64, 4, 4>::const_from([
     [0.0, 0.0, 0.0, 1.0],
 ]);
 
+static mut vertex_buffer: Vec<f64> = Vec::new();
+
 #[wasm_bindgen]
 pub fn set_frame_size(width: usize, height: usize) {
     unsafe {
