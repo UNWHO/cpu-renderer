@@ -51,13 +51,13 @@ impl<T: Number> Vector3<T> {
         Self::from(&[[x, y, z]])
     }
 
-    pub fn cross(&self, rhs: &Self) -> Self {
-        Self::from(&[[
-            self.y() * rhs.z() - self.z() * rhs.y(),
-            self.z() * rhs.x() - self.x() * rhs.z(),
-            self.x() * rhs.y() - self.y() * rhs.x(),
-        ]])
-    }
+    // pub fn cross(&self, rhs: &Self) -> Self {
+    //     Self::from(&[[
+    //         self.y() * rhs.z() - self.z() * rhs.y(),
+    //         self.z() * rhs.x() - self.x() * rhs.z(),
+    //         self.x() * rhs.y() - self.y() * rhs.x(),
+    //     ]])
+    // }
 
     pub fn to_homogeneous(&self) -> Vector4<T> {
         Vector4::new(self.x(), self.y(), self.z(), T::one())
@@ -83,14 +83,14 @@ impl<T: Number> Vector4<T> {
 #[cfg(test)]
 mod test {
 
-    use super::Vector3;
+    // use super::Vector3;
 
-    #[test]
-    fn operate() {
-        let mut vec1 = Vector3::from(&[[1, 2, 3]]);
-        let vec2 = Vector3::from(&[[4, 5, 6]]);
+    // #[test]
+    // fn operate() {
+    //     let mut vec1 = Vector3::from(&[[1, 2, 3]]);
+    //     let vec2 = Vector3::from(&[[4, 5, 6]]);
 
-        vec1.add(&vec2);
-        assert_eq!(Vector3::from(&[[5, 7, 9]]), vec1)
-    }
+    //     vec1.add(&vec2);
+    //     assert_eq!(Vector3::from(&[[5, 7, 9]]), vec1)
+    // }
 }

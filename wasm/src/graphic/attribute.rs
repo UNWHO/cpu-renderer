@@ -11,8 +11,10 @@ pub fn create_attribute_array() -> Handle {
     unsafe {
         ATTRIBUTES.push(AttributeArray::new());
 
+        let handle = HANDLE_INDEX;
         HANDLE_INDEX += 1;
-        HANDLE_INDEX
+
+        handle
     }
 }
 
@@ -32,11 +34,9 @@ fn get_attr_array_as_mut() -> &'static mut AttributeArray {
 }
 
 #[wasm_bindgen]
-pub fn push_attr(stride: usize) {
-    unsafe {
-        let attr_array = get_attr_array_as_mut();
-        attr_array.attr.push(stride)
-    }
+pub fn push_attr(length: usize) {
+    let attr_array = get_attr_array_as_mut();
+    attr_array.attr.push(length)
 }
 
 pub struct AttributeArray {
@@ -50,5 +50,9 @@ impl AttributeArray {
 
     pub fn get_attrs(&self) -> &Vec<usize> {
         &self.attr
+    }
+
+    pub fn get_stride(&self) -> usize {
+        self.attr.iter().fold(0, |acc, len| acc + len)
     }
 }

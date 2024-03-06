@@ -1,10 +1,12 @@
 import {
+  UniformMatrix,
   clear_buffer,
   draw_triangle,
   render,
   set_frame_size,
-  set_mvp_matrix,
+  set_uniform_matrix,
 } from "../wasm/pkg/cpu_renderer";
+import { initRenderer } from "./init";
 import { Resolution, resolutionConfig } from "./resolution";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -12,13 +14,6 @@ const select = document.getElementById("resolution") as HTMLSelectElement;
 const fps = document.getElementById("fps") as HTMLDivElement;
 
 const context = canvas.getContext("2d")!;
-
-const vertices = new Float64Array([
-  -0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0,
-]);
-const colors = new Float64Array([
-  1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-]);
 
 let theta = 0;
 
@@ -43,6 +38,7 @@ select.oninput = () => {
 };
 
 function init() {
+  initRenderer();
   set_frame_size(canvas.width, canvas.height);
 
   reqAnimFrameHandle = requestAnimationFrame(loop);
@@ -81,9 +77,11 @@ function loop() {
     projMatrix
   );
 
-  set_mvp_matrix(new Float64Array(mvpMatrix.flat()));
-
-  draw_triangle(vertices, colors);
+  set_uniform_matrix(
+    UniformMatrix.MvpMatrix,
+    new Float64Array(mvpMatrix.flat())
+  );
+  draw_triangle();
 
   imageData.data.set(render());
   context.putImageData(imageData, 0, 0);

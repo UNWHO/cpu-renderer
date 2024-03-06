@@ -2,25 +2,12 @@ pub mod attribute;
 pub mod buffer;
 pub mod color;
 pub mod fragment;
+pub mod shader;
 pub mod uniform;
 pub mod vertex;
 
 use self::{color::Color, fragment::Fragment, vertex::Vertex};
-use crate::math::{
-    matrix::Matrix,
-    vector::{Vector2, Vector3},
-};
-
-pub fn vertex_shader(vertex: &Vertex, mvp_matrix: &Matrix<f64, 4, 4>) -> Vertex {
-    Vertex {
-        pos: vertex
-            .pos
-            .to_homogeneous()
-            .mul_matrix(mvp_matrix)
-            .from_homogeneous(),
-        color: vertex.color.clone(),
-    }
-}
+use crate::math::vector::{Vector2, Vector3};
 
 pub fn rasterize(triangle: &Vec<Vertex>, width: usize, height: usize) -> Vec<Fragment> {
     let mut fragements = Vec::<Fragment>::new();
