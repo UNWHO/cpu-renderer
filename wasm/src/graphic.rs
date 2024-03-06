@@ -1,6 +1,7 @@
 pub mod buffer;
 pub mod color;
 pub mod fragment;
+pub mod uniform;
 pub mod vertex;
 
 use self::{color::Color, fragment::Fragment, vertex::Vertex};

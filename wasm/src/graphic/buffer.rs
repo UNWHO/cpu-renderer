@@ -42,6 +42,7 @@ pub fn bind_buffer(buffer_type: BufferType, handle: BufferHandle) {
     }
 }
 
+#[inline]
 pub fn get_buffer(buffer_type: BufferType) -> &'static Buffer {
     unsafe {
         let handle = BIND_MAP[buffer_type as usize];
