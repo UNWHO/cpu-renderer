@@ -17,7 +17,7 @@ pub enum BufferType {
 #[wasm_bindgen]
 pub fn create_buffer() -> BufferHandle {
     unsafe {
-        BUFFERS[HANDLE_INDEX] = Vec::<f64>::new();
+        BUFFERS.push(Vec::<f64>::new());
 
         HANDLE_INDEX += 1;
         HANDLE_INDEX
