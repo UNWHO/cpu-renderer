@@ -40,8 +40,8 @@ export class Vector {
     return new Vector(...this.elements.map((element) => element * scala));
   }
 
-  multiplyMatrix(matrix: Matrix) {
-    let temp = new Array(this.elements.length).fill(0);
+  multiplyMatrix(matrix: Matrix): Vector {
+    let temp: number[] = new Array(this.elements.length).fill(0);
 
     for (let i = 0; i < this.elements.length; i++) {
       let sum = 0;
@@ -51,7 +51,7 @@ export class Vector {
       temp[i] = sum;
     }
 
-    this.elements = temp;
+    return new Vector(...temp);
   }
 }
 
@@ -84,8 +84,8 @@ export class Vector2 extends Vector {
     return Vector2.from(super.multiplyScala(scala));
   }
 
-  multiplyMatrix(matrix: Matrix2) {
-    super.multiplyMatrix(matrix);
+  multiplyMatrix(matrix: Matrix2): Vector2 {
+    return Vector2.from(super.multiplyMatrix(matrix));
   }
 
   get x(): number {
@@ -138,8 +138,8 @@ export class Vector3 extends Vector {
     return Vector3.from(super.multiplyScala(scala));
   }
 
-  multiplyMatrix(matrix: Matrix3) {
-    super.multiplyMatrix(matrix);
+  multiplyMatrix(matrix: Matrix3): Vector3 {
+    return Vector3.from(super.multiplyMatrix(matrix));
   }
 
   cross(rhs: Vector3): Vector3 {
@@ -208,8 +208,8 @@ export class Vector4 extends Vector {
   multiplyScala(scala: number): Vector4 {
     return Vector4.from(super.multiplyScala(scala));
   }
-  multiplyMatrix(matrix: Matrix4) {
-    super.multiplyMatrix(matrix);
+  multiplyMatrix(matrix: Matrix4): Vector4 {
+    return Vector4.from(super.multiplyMatrix(matrix));
   }
 
   get x(): number {

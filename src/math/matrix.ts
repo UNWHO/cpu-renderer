@@ -165,4 +165,20 @@ export class Matrix4 extends Matrix {
       [0, 0, 0, 1],
     ]).multiply(Matrix4.translate([-eye.x, -eye.y, -eye.z]));
   }
+
+  static frustrum(
+    left: number,
+    right: number,
+    bottom: number,
+    top: number,
+    near: number,
+    far: number
+  ): Matrix4 {
+    return new Matrix4([
+      [(2 * near) / (right - left), 0, (right + left) / (right - left), 0],
+      [0, (2 * near) / (top - bottom), (top + bottom) / (top - bottom), 0],
+      [0, 0, -(far + near) / (far - near), -(2 * far * near) / (far - near)],
+      [0, 0, -1, 0],
+    ]);
+  }
 }

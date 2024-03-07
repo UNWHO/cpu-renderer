@@ -8,7 +8,7 @@ import {
 } from "../wasm/pkg/cpu_renderer";
 import { initRenderer } from "./init";
 import { Matrix4 } from "./math/matrix";
-import { Vector3 } from "./math/vector";
+import { Vector3, Vector4 } from "./math/vector";
 import { writeFPS, writeResolution } from "./ui";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -24,6 +24,8 @@ let camera = {
   eye: new Vector3(0, 0, -1),
   target: new Vector3(0, 0, 0),
   up: new Vector3(0, 1, 0),
+  near: 0.01,
+  far: 100,
 };
 
 function init() {
@@ -61,9 +63,31 @@ function loop() {
 
   const viewMatrix = Matrix4.lookAt(camera.eye, camera.target, camera.up);
 
-  const projMatrix = Matrix4.identity();
+  const fov = 0.00001;
+  const projMatrix = Matrix4.frustrum(
+    -canvas.width * fov,
+    canvas.width * fov,
+    -canvas.height * fov,
+    canvas.height * fov,
+    camera.near,
+    camera.far
+  );
 
-  const mvpMatrix = modelMatrix.multiply(viewMatrix).multiply(projMatrix);
+  const mvpMatrix = projMatrix.multiply(viewMatrix).multiply(modelMatrix);
+  console.log(mvpMatrix);
+  console.log(
+    new Vector4(0.0, 0.5, 0.0, 1.0).multiplyMatrix(
+      new Matrix4([
+        [0.001141509044593803, -0.000011824573846035142, 0, 0],
+
+        [0.000009961798514125497, 0.0013549619553715059, 0, 0],
+
+        [0, 0, -2.0002000200020005, -0.020002000200020003],
+
+        [0, 0, -1, 0],
+      ])
+    )
+  );
 
   set_uniform_matrix(
     UniformMatrix.MvpMatrix,
