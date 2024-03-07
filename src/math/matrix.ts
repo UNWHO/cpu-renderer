@@ -112,7 +112,7 @@ export class Matrix4 extends Matrix {
     const rad = Util.degToRad(degree);
 
     const cos = Math.cos(rad);
-    const sin = Math.cos(rad);
+    const sin = Math.sin(rad);
 
     matrix.elements[1][1] = cos;
     matrix.elements[1][2] = -sin;
@@ -127,7 +127,7 @@ export class Matrix4 extends Matrix {
     const rad = Util.degToRad(degree);
 
     const cos = Math.cos(rad);
-    const sin = Math.cos(rad);
+    const sin = Math.sin(rad);
 
     matrix.elements[0][0] = cos;
     matrix.elements[0][2] = sin;
@@ -142,7 +142,7 @@ export class Matrix4 extends Matrix {
     const rad = Util.degToRad(degree);
 
     const cos = Math.cos(rad);
-    const sin = Math.cos(rad);
+    const sin = Math.sin(rad);
 
     matrix.elements[0][0] = cos;
     matrix.elements[0][1] = -sin;
