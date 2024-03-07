@@ -8,41 +8,40 @@ import {
 } from "../wasm/pkg/cpu_renderer";
 import { initRenderer } from "./init";
 import { Matrix4 } from "./math/matrix";
-import { Resolution, resolutionConfig } from "./resolution";
+import { writeFPS, writeResolution } from "./ui";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const select = document.getElementById("resolution") as HTMLSelectElement;
-const fps = document.getElementById("fps") as HTMLDivElement;
-
 const context = canvas.getContext("2d")!;
 
-let theta = 0;
-
-let imageData = context.createImageData(canvas.width, canvas.height);
+let imageData: ImageData;
 let reqAnimFrameHandle: number;
 
+let theta = 0;
 let previousTime = Date.now();
 
-select.oninput = () => {
-  cancelAnimationFrame(reqAnimFrameHandle);
+function init() {
+  initRenderer();
 
-  const { width, height } = resolutionConfig[select.value as Resolution];
+  writeResolution(canvas.width, canvas.height);
+  set_frame_size(canvas.width, canvas.height);
+
+  onWindowResize();
+  window.addEventListener("resize", onWindowResize);
+
+  reqAnimFrameHandle = requestAnimationFrame(loop);
+}
+
+function onWindowResize() {
+  const width = document.body.clientWidth;
+  const height = document.body.clientHeight;
 
   canvas.width = width;
   canvas.height = height;
 
-  imageData = context.createImageData(width, height);
-
   set_frame_size(width, height);
+  imageData = context.createImageData(canvas.width, canvas.height);
 
-  reqAnimFrameHandle = requestAnimationFrame(loop);
-};
-
-function init() {
-  initRenderer();
-  set_frame_size(canvas.width, canvas.height);
-
-  reqAnimFrameHandle = requestAnimationFrame(loop);
+  writeResolution(canvas.width, canvas.height);
 }
 
 function loop() {
@@ -70,7 +69,7 @@ function loop() {
 
   let currentTime = Date.now();
   let deltaTime = currentTime - previousTime;
-  fps.innerHTML = `${1000 / deltaTime}fps`;
+  writeFPS(1000 / deltaTime);
   previousTime = currentTime;
 
   reqAnimFrameHandle = requestAnimationFrame(loop);

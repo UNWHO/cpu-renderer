@@ -4,21 +4,37 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Cpu Renderer</title>
     <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+
       canvas {
-        width: 1920px;
-        height: 1080px;
+        width: 100%;
+        height: 100%;
+        display: block;
+        box-sizing: border-box;
+      }
+
+      #ui {
+        position: fixed;
+        top: 0;
+        left: 0;
       }
     </style>
   </head>
+
   <body>
     <canvas id="canvas" width="1920" height="1080"></canvas>
-    <select id="resolution">
-      <option value="FHD" selected>1920 * 1080</option>
-      <option value="HD">1280 * 720</option>
-    </select>
-    <div id="fps">60</div>
+    <div id="ui">
+      <div id="fps">60</div>
+      <div id="resolution"></div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
