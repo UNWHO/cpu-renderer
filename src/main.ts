@@ -8,6 +8,7 @@ import {
 } from "../wasm/pkg/cpu_renderer";
 import { initRenderer } from "./init";
 import { Matrix4 } from "./math/matrix";
+import { Vector3 } from "./math/vector";
 import { writeFPS, writeResolution } from "./ui";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -18,6 +19,12 @@ let reqAnimFrameHandle: number;
 
 let theta = 0;
 let previousTime = Date.now();
+
+let camera = {
+  eye: new Vector3(0, 0, -1),
+  target: new Vector3(0, 0, 0),
+  up: new Vector3(0, 1, 0),
+};
 
 function init() {
   initRenderer();
@@ -52,7 +59,7 @@ function loop() {
 
   const modelMatrix = Matrix4.rotateZ(theta);
 
-  const viewMatrix = Matrix4.identity();
+  const viewMatrix = Matrix4.lookAt(camera.eye, camera.target, camera.up);
 
   const projMatrix = Matrix4.identity();
 

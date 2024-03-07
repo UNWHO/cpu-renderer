@@ -1,4 +1,5 @@
 import { Util } from "./util";
+import { Vector3 } from "./vector";
 
 export class Matrix {
   elements: number[][];
@@ -150,5 +151,18 @@ export class Matrix4 extends Matrix {
     matrix.elements[1][1] = cos;
 
     return matrix;
+  }
+
+  static lookAt(eye: Vector3, center: Vector3, up: Vector3): Matrix4 {
+    const v = up;
+    const n = eye.sub(center).normalize().multiplyScala(-1);
+    const u = v.cross(n);
+
+    return new Matrix4([
+      [u.x, u.y, u.z, 0],
+      [v.x, v.y, v.z, 0],
+      [n.x, n.y, n.z, 0],
+      [0, 0, 0, 1],
+    ]).multiply(Matrix4.translate([-eye.x, -eye.y, -eye.z]));
   }
 }
