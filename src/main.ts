@@ -15,7 +15,6 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d")!;
 
 let imageData: ImageData;
-let reqAnimFrameHandle: number;
 
 let theta = 0;
 let previousTime = Date.now();
@@ -37,7 +36,7 @@ function init() {
   onWindowResize();
   window.addEventListener("resize", onWindowResize);
 
-  reqAnimFrameHandle = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
 function onWindowResize() {
@@ -103,7 +102,7 @@ function loop() {
   writeFPS(1000 / deltaTime);
   previousTime = currentTime;
 
-  reqAnimFrameHandle = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
 init();
