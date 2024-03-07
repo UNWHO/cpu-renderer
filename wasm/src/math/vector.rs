@@ -20,7 +20,7 @@ impl<T: Number, const S: usize> Vector<T, S> {
     }
 
     pub fn mul_matrix(&mut self, matrix: &Matrix<T, S, S>) -> &mut Self {
-        let mut temp = [T::zero(); 4];
+        let mut temp = [T::zero(); S];
 
         for i in 0..S {
             let mut sum = T::zero();
