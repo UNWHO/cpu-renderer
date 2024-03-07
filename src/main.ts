@@ -7,6 +7,7 @@ import {
   set_uniform_matrix,
 } from "../wasm/pkg/cpu_renderer";
 import { initRenderer } from "./init";
+import { Matrix4 } from "./math/matrix";
 import { Resolution, resolutionConfig } from "./resolution";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -49,37 +50,18 @@ function loop() {
 
   // rotate model around z-axis
   theta += 0.5;
-  const rad = (theta * Math.PI) / 180;
 
-  const modelMatrix = [
-    [Math.cos(rad), -Math.sin(rad), 0, 0],
-    [Math.sin(rad), Math.cos(rad), 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-  ];
+  const modelMatrix = Matrix4.rotateZ(theta);
 
-  const viewMatrix = [
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-  ];
+  const viewMatrix = Matrix4.identity();
 
-  const projMatrix = [
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-  ];
+  const projMatrix = Matrix4.identity();
 
-  const mvpMatrix = multiplyMatrix(
-    multiplyMatrix(modelMatrix, viewMatrix),
-    projMatrix
-  );
+  const mvpMatrix = modelMatrix.multiply(viewMatrix).multiply(projMatrix);
 
   set_uniform_matrix(
     UniformMatrix.MvpMatrix,
-    new Float64Array(mvpMatrix.flat())
+    new Float64Array(mvpMatrix.elements.flat())
   );
   draw_triangle();
 
@@ -95,17 +77,3 @@ function loop() {
 }
 
 init();
-
-function multiplyMatrix(a: number[][], b: number[][]): number[][] {
-  const result = new Array(4).fill(null).map(() => new Array(4).fill(0));
-
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 4; j++) {
-      for (let k = 0; k < 4; k++) {
-        result[j][i] += a[j][k] * b[k][i];
-      }
-    }
-  }
-
-  return result;
-}
