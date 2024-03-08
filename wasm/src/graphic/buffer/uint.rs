@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 type BufferHandle = usize;
-type BufferData = u64;
+type BufferData = usize;
 type Buffer = Vec<BufferData>;
 
 static mut HANDLE_INDEX: BufferHandle = 0;

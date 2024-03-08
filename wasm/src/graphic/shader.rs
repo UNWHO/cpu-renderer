@@ -1,25 +1,20 @@
-use crate::alert;
-
 use super::{
     attribute::get_attr_array,
-    buffer::{
-        float::{get_float_buffer, FloatBufferType},
-        uint::{get_uint_buffer, UintBufferType},
-    },
+    buffer::float::{get_float_buffer, FloatBufferType},
 };
 
-pub fn vertex_shader<O, F>(function: F) -> Vec<O>
+pub fn vertex_shader<O, F>(indices: &[usize; 3], function: F) -> Vec<O>
 where
     F: Fn(&Vec<&[f64]>) -> O,
 {
     let vao = get_attr_array();
     let vbo = get_float_buffer(FloatBufferType::ArrayBuffer);
-    let ebo = get_uint_buffer(UintBufferType::ElementArrayBuffer);
 
     let attrs = vao.get_attrs();
     let stride = vao.get_stride();
 
-    ebo.iter()
+    indices
+        .iter()
         .map(|index| {
             let mut offset = 0;
 
@@ -38,13 +33,4 @@ where
             function(&inputs)
         })
         .collect()
-
-    // Vertex {
-    //     pos: vertex
-    //         .pos
-    //         .to_homogeneous()
-    //         .mul_matrix(get_uniform_matrix(uniform::UniformMatrix::MvpMatrix))
-    //         .from_homogeneous(),
-    //     color: vertex.color.clone(),
-    // }
 }

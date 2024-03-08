@@ -2,8 +2,13 @@ mod graphic;
 mod math;
 mod utils;
 
+use std::convert::TryInto;
+
 use graphic::{
-    buffer::{float::init_float_buffer_map, uint::init_uint_buffer_map},
+    buffer::{
+        float::init_float_buffer_map,
+        uint::{get_uint_buffer, init_uint_buffer_map, UintBufferType},
+    },
     color::Color,
     fragment::Fragment,
     rasterize,
@@ -37,46 +42,42 @@ pub fn set_frame_size(width: usize, height: usize) {
 
 #[wasm_bindgen]
 pub fn render() -> Uint8ClampedArray {
-    unsafe {
-        // let vertices = vertex_shader(
-        //     &mut triangle,
-        //     &model_matrix
-        //         .mul(&view_matrix)
-        //         .mul(&view_matrix)
-        //         .mul(&projection_matrix),
-        // );
-        // render(WIDTH, HEIGHT, &mut buffer);
-
-        Uint8ClampedArray::view(&FRAME_BUFFER)
-    }
+    unsafe { Uint8ClampedArray::view(&FRAME_BUFFER) }
 }
 
 #[wasm_bindgen]
-pub fn draw_triangle() {
+pub fn draw() {
     unsafe {
+        let ebo = get_uint_buffer(UintBufferType::ElementArrayBuffer);
+
         let mvp_matrix = get_uniform_matrix(UniformMatrix::MvpMatrix);
 
-        let vertices: Vec<Vertex> = vertex_shader(|inputs| {
-            let pos = Vector3::new(inputs[0][0], inputs[0][1], inputs[0][2]);
-            let color = Color::new(inputs[1][0], inputs[1][1], inputs[1][2], inputs[1][3]);
+        for i in (0..ebo.len()).step_by(3) {
+            // alert(&i.to_string());
+            let indices: &[usize; 3] = &ebo[i..i + 3].try_into().unwrap();
 
-            let pos = pos
-                .to_homogeneous()
-                .mul_matrix(mvp_matrix)
-                .from_homogeneous();
+            let vertices: Vec<Vertex> = vertex_shader(indices, |inputs| {
+                let pos = Vector3::new(inputs[0][0], inputs[0][1], inputs[0][2]);
+                let color = Color::new(inputs[1][0], inputs[1][1], inputs[1][2], inputs[1][3]);
 
-            Vertex { pos, color }
-        });
+                let pos = pos
+                    .to_homogeneous()
+                    .mul_matrix(mvp_matrix)
+                    .from_homogeneous();
 
-        let fragments: Vec<Fragment> = rasterize(&vertices, WIDTH, HEIGHT);
-        fragments.iter().for_each(|fragment| {
-            let index = (fragment.pos.y() * WIDTH + fragment.pos.x()) * 4;
+                Vertex { pos, color }
+            });
 
-            FRAME_BUFFER[index] = (fragment.color.x() * 255.0) as u8;
-            FRAME_BUFFER[index + 1] = (fragment.color.y() * 255.0) as u8;
-            FRAME_BUFFER[index + 2] = (fragment.color.z() * 255.0) as u8;
-            FRAME_BUFFER[index + 3] = (fragment.color.w() * 255.0) as u8;
-        });
+            let fragments: Vec<Fragment> = rasterize(&vertices, WIDTH, HEIGHT);
+            fragments.iter().for_each(|fragment| {
+                let index = (fragment.pos.y() * WIDTH + fragment.pos.x()) * 4;
+
+                FRAME_BUFFER[index] = (fragment.color.x() * 255.0) as u8;
+                FRAME_BUFFER[index + 1] = (fragment.color.y() * 255.0) as u8;
+                FRAME_BUFFER[index + 2] = (fragment.color.z() * 255.0) as u8;
+                FRAME_BUFFER[index + 3] = (fragment.color.w() * 255.0) as u8;
+            });
+        }
     }
 }
 

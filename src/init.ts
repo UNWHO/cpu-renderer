@@ -23,17 +23,29 @@ export function initRenderer() {
   write_float_buffer(
     FloatBufferType.ArrayBuffer,
     new Float64Array([
-      // top
-      ...[0.0, 0.5, 0.0], // pos
+      ...[-0.5, 0.5, -0.5], // pos
       ...[1.0, 0.0, 0.0, 1.0], // color
 
-      // left
-      ...[-0.5, -0.5, 0.0], // pos
+      ...[-0.5, -0.5, -0.5], // pos
       ...[0.0, 1.0, 0.0, 1.0], // color
 
-      // right
-      ...[0.5, -0.5, 0.0], // pos
+      ...[0.5, -0.5, -0.5], // pos
       ...[0.0, 0.0, 1.0, 1.0], // color
+
+      ...[0.5, 0.5, -0.5], // pos
+      ...[1.0, 1.0, 0.0, 1.0], // color
+
+      ...[-0.5, 0.5, 0.5], // pos
+      ...[1.0, 0.0, 1.0, 1.0], // color
+
+      ...[-0.5, -0.5, 0.5], // pos
+      ...[0.0, 1.0, 1.0, 1.0], // color
+
+      ...[0.5, -0.5, 0.5], // pos
+      ...[0.0, 0.0, 0.0, 1.0], // color
+
+      ...[0.5, 0.5, 0.5], // pos
+      ...[1.0, 1.0, 1.0, 1.0], // color
     ])
   );
 
@@ -41,6 +53,13 @@ export function initRenderer() {
   bind_uint_buffer(UintBufferType.ElementArrayBuffer, ebo);
   write_uint_buffer(
     UintBufferType.ElementArrayBuffer,
-    BigUint64Array.from([0n, 1n, 2n])
+    Uint32Array.from([
+      ...[0, 1, 2, 0, 2, 3],
+      ...[3, 2, 6, 3, 6, 7],
+      ...[7, 6, 5, 7, 5, 4],
+      ...[4, 5, 1, 4, 1, 0],
+      ...[4, 0, 3, 4, 3, 7],
+      ...[5, 6, 2, 5, 2, 1],
+    ])
   );
 }
