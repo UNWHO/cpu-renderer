@@ -9,16 +9,13 @@ use graphic::{
         float::init_float_buffer_map,
         uint::{get_uint_buffer, init_uint_buffer_map, UintBufferType},
     },
-    color::Color,
-    fragment::Fragment,
-    rasterize,
+    rasterize::{self, rasterize},
     shader::vertex_shader,
     uniform::{get_uniform_matrix, init_uniform_matrix_map, UniformMatrix},
-    vertex::Vertex,
 };
 use js_sys::Uint8ClampedArray;
 
-use math::vector::Vector3;
+use math::vector::{accessor::Accessor2d, Vector3};
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 
@@ -56,26 +53,28 @@ pub fn draw() {
             // alert(&i.to_string());
             let indices: &[usize; 3] = &ebo[i..i + 3].try_into().unwrap();
 
-            let vertices: Vec<Vertex> = vertex_shader(indices, |inputs| {
+            let vertices: [rasterize::Input<4>; 3] = vertex_shader(indices, |inputs| {
                 let pos = Vector3::new(inputs[0][0], inputs[0][1], inputs[0][2]);
-                let color = Color::new(inputs[1][0], inputs[1][1], inputs[1][2], inputs[1][3]);
 
                 let pos = pos
                     .to_homogeneous()
                     .mul_matrix(mvp_matrix)
                     .from_homogeneous();
 
-                Vertex { pos, color }
+                rasterize::Input {
+                    pos,
+                    varying: [inputs[1][0], inputs[1][1], inputs[1][2], inputs[1][3]],
+                }
             });
 
-            let fragments: Vec<Fragment> = rasterize(&vertices, WIDTH, HEIGHT);
+            let fragments = rasterize(&vertices.try_into().unwrap(), WIDTH, HEIGHT);
             fragments.iter().for_each(|fragment| {
                 let index = (fragment.pos.y() * WIDTH + fragment.pos.x()) * 4;
 
-                FRAME_BUFFER[index] = (fragment.color.x() * 255.0) as u8;
-                FRAME_BUFFER[index + 1] = (fragment.color.y() * 255.0) as u8;
-                FRAME_BUFFER[index + 2] = (fragment.color.z() * 255.0) as u8;
-                FRAME_BUFFER[index + 3] = (fragment.color.w() * 255.0) as u8;
+                FRAME_BUFFER[index] = (fragment.varying[0] * 0.0) as u8;
+                FRAME_BUFFER[index + 1] = (fragment.varying[1] * 255.0) as u8;
+                FRAME_BUFFER[index + 2] = (fragment.varying[2] * 255.0) as u8;
+                FRAME_BUFFER[index + 3] = (fragment.varying[3] * 255.0) as u8;
             });
         }
     }

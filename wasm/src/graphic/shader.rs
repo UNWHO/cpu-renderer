@@ -3,7 +3,7 @@ use super::{
     buffer::float::{get_float_buffer, FloatBufferType},
 };
 
-pub fn vertex_shader<O, F>(indices: &[usize; 3], function: F) -> Vec<O>
+pub fn vertex_shader<O, F>(indices: &[usize; 3], function: F) -> [O; 3]
 where
     F: Fn(&Vec<&[f64]>) -> O,
 {
@@ -13,24 +13,27 @@ where
     let attrs = vao.get_attrs();
     let stride = vao.get_stride();
 
-    indices
-        .iter()
-        .map(|index| {
-            let mut offset = 0;
+    let operation = |index: usize| {
+        let mut offset = 0;
 
-            let inputs = attrs
-                .iter()
-                .map(|len| {
-                    let start = (*index as usize) * stride + offset;
-                    let end = start + len;
-                    let input = &vbo[start..end];
+        let inputs = attrs
+            .iter()
+            .map(|len| {
+                let start = (index as usize) * stride + offset;
+                let end = start + len;
+                let input = &vbo[start..end];
 
-                    offset += len;
-                    input
-                })
-                .collect();
+                offset += len;
+                input
+            })
+            .collect();
 
-            function(&inputs)
-        })
-        .collect()
+        function(&inputs)
+    };
+
+    [
+        operation(indices[0]),
+        operation(indices[1]),
+        operation(indices[2]),
+    ]
 }

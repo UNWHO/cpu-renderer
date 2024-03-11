@@ -1,10 +1,11 @@
+use self::accessor::*;
+
 use super::{matrix::Matrix, number::Number};
 
 pub type Vector<T, const S: usize> = Matrix<T, S, 1>;
-
-pub type Vector2<T> = Vector<T, 2>;
-pub type Vector3<T> = Vector<T, 3>;
-pub type Vector4<T> = Vector<T, 4>;
+pub type Vector2<T = f64> = Vector<T, 2>;
+pub type Vector3<T = f64> = Vector<T, 3>;
+pub type Vector4<T = f64> = Vector<T, 4>;
 
 pub mod accessor;
 
