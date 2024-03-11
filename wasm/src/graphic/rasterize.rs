@@ -7,23 +7,23 @@ use crate::math::{
 };
 use std::convert::TryInto;
 
-pub struct Input<const T: usize> {
+pub struct Vertex<const T: usize> {
     pub pos: Vector3,
     pub varying: [f64; T],
 }
 
-pub struct Output<const T: usize> {
+pub struct Fragment<const T: usize> {
     pub pos: Vector2<usize>,
     pub depth: f64,
     pub varying: [f64; T],
 }
 
 pub fn rasterize<const T: usize>(
-    vertices: &[Input<T>; 3],
+    vertices: &[Vertex<T>; 3],
     width: usize,
     height: usize,
-) -> Vec<Output<T>> {
-    let mut fragements = Vec::<Output<T>>::new();
+) -> Vec<Fragment<T>> {
+    let mut fragements = Vec::<Fragment<T>>::new();
 
     let depth = Vector3::new(
         vertices[0].pos.z(),
@@ -81,7 +81,7 @@ pub fn rasterize<const T: usize>(
 
             let weight = Vector3::new(weights[0], weights[1], weights[2]);
 
-            fragements.push(Output {
+            fragements.push(Fragment {
                 pos: Vector2::new(i, j),
                 depth: depth.dot(&weight),
                 varying: varying
