@@ -53,8 +53,18 @@ pub fn rasterize<const T: usize>(
 
     let area = edge(&vertices[0], &vertices[1], &vertices[2]);
 
-    for i in 0..width {
-        for j in 0..height {
+    let w_min = f64::min(vertices[0].x(), vertices[1].x()).min(vertices[2].x());
+    let w_max: f64 = f64::max(vertices[0].x(), vertices[1].x()).max(vertices[2].x());
+    let h_min: f64 = f64::min(vertices[0].y(), vertices[1].y()).min(vertices[2].y());
+    let h_max: f64 = f64::max(vertices[0].y(), vertices[1].y()).max(vertices[2].y());
+
+    let w_min = w_min.floor() as usize;
+    let w_max = w_max.ceil() as usize;
+    let h_min = h_min.floor() as usize;
+    let h_max = h_max.ceil() as usize;
+
+    for i in w_min..w_max {
+        for j in h_min..h_max {
             let point = Vector2::new(i as f64 + 0.5, j as f64 + 0.5);
 
             let mut weights = [
