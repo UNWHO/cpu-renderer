@@ -12,7 +12,7 @@ import {
   write_uint_buffer,
 } from "../wasm/pkg/cpu_renderer";
 
-export function initRenderer() {
+export function initModel() {
   const vao = create_attribute_array();
   bind_attribute_array(vao);
   push_attr(3); // pos

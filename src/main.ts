@@ -6,10 +6,11 @@ import {
   set_frame_size,
   set_uniform_matrix,
 } from "../wasm/pkg/cpu_renderer";
-import { initRenderer } from "./init";
+import { initModel } from "./model";
 import { Matrix4 } from "./math/matrix";
 import { Vector3 } from "./math/vector";
 import { writeFPS, writeResolution } from "./ui";
+import { initTexture } from "./texture";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const context = canvas.getContext("2d")!;
@@ -27,8 +28,9 @@ let camera = {
   far: 100,
 };
 
-function init() {
-  initRenderer();
+async function init() {
+  initModel();
+  await initTexture();
 
   writeResolution(canvas.width, canvas.height);
   set_frame_size(canvas.width, canvas.height);
