@@ -2,6 +2,7 @@ pub mod attribute;
 pub mod buffer;
 pub mod rasterize;
 pub mod shader;
+pub mod texture;
 pub mod uniform;
 
 // pub fn render(width: usize, height: usize, buffer: &mut Vec<u8>) {
