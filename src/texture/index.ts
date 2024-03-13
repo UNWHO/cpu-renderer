@@ -1,7 +1,21 @@
+import {
+  TextureIndex,
+  bind_texture,
+  create_texture,
+  write_texture,
+} from "../../wasm/pkg/cpu_renderer";
 import image from "./box.bmp";
 
 export async function initTexture() {
-  const texture = await readImage();
+  const image = await readImage();
+  const handle = create_texture();
+  bind_texture(TextureIndex.T0, handle);
+  write_texture(
+    TextureIndex.T0,
+    image.width,
+    image.height,
+    new Float64Array(image.data)
+  );
 }
 
 async function readImage() {
@@ -27,13 +41,13 @@ async function readImage() {
       const green = dataView.getUint8(offset + 1);
       const red = dataView.getUint8(offset + 2);
 
-      pixelArray.push(red, green, blue, 255);
+      pixelArray.push(red, green, blue);
     }
   }
 
   return {
     width,
     height,
-    pixelArray,
+    data: pixelArray.map((el) => el / 255),
   };
 }

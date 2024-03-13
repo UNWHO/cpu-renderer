@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use wasm_bindgen::prelude::*;
 
 type Handle = usize;
@@ -5,7 +7,22 @@ type Handle = usize;
 pub struct Texture {
     pub width: usize,
     pub height: usize,
-    pub data: Vec<u8>,
+    pub data: Vec<f64>,
+}
+
+impl Texture {
+    pub fn get_color(&self, u: f64, v: f64) -> [f64; 3] {
+        let u = ((u * self.width as f64) as usize)
+            .max(0)
+            .min(self.width - 1);
+        let v = ((v * self.width as f64) as usize)
+            .max(0)
+            .min(self.height - 1);
+
+        let index = (v * self.width + u) * 3;
+
+        self.data[index..index + 3].try_into().unwrap()
+    }
 }
 
 const MAX_TEXTURE: usize = 16;
@@ -36,7 +53,7 @@ pub fn create_texture() -> usize {
 }
 
 #[wasm_bindgen]
-pub fn write_texture(index: TextureIndex, width: usize, height: usize, data: &[u8]) {
+pub fn write_texture(index: TextureIndex, width: usize, height: usize, data: &[f64]) {
     let texture = get_texture_as_mut(index);
 
     texture.width = width;

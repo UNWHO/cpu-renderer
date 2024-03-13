@@ -11,6 +11,7 @@ use graphic::{
     },
     rasterize::{rasterize, Vertex},
     shader::{fragment_shader, vertex_shader},
+    texture::{get_texture, TextureIndex},
     uniform::{get_uniform_matrix, init_uniform_matrix_map, UniformMatrix},
 };
 use js_sys::Uint8ClampedArray;
@@ -48,6 +49,7 @@ pub fn draw() {
         let ebo = get_uint_buffer(UintBufferType::ElementArrayBuffer);
 
         let mvp_matrix = get_uniform_matrix(UniformMatrix::MvpMatrix);
+        let texture = get_texture(TextureIndex::T0);
 
         for i in (0..ebo.len()).step_by(3) {
             // alert(&i.to_string());
@@ -58,12 +60,28 @@ pub fn draw() {
                     .to_homogeneous()
                     .mul_matrix(mvp_matrix)
                     .from_homogeneous(),
-                varying: [inputs[1][0], inputs[1][1], inputs[1][2], inputs[1][3]],
+                varying: [
+                    // color
+                    // inputs[1][0],
+                    // inputs[1][1],
+                    // inputs[1][2],
+                    // inputs[1][3],
+                    // tex coord
+                    inputs[1][0],
+                    inputs[1][1],
+                ],
             });
 
             let fragments = rasterize(&vertices.try_into().unwrap(), WIDTH, HEIGHT);
 
-            fragment_shader(&fragments, |varying| *varying);
+            fragment_shader(&fragments, |varying| {
+                let u = varying[0];
+                let v = varying[1];
+
+                let rgb = texture.get_color(u, v);
+
+                [rgb[0], rgb[1], rgb[2], 1.0]
+            });
         }
     }
 }

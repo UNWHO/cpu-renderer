@@ -7,7 +7,7 @@ import {
   set_uniform_matrix,
 } from "../wasm/pkg/cpu_renderer";
 import { initModel } from "./model";
-import { Matrix4 } from "./math/matrix";
+import { Matrix, Matrix4 } from "./math/matrix";
 import { Vector3 } from "./math/vector";
 import { writeFPS, writeResolution } from "./ui";
 import { initTexture } from "./texture";
@@ -60,7 +60,9 @@ function loop() {
   // rotate model around z-axis
   theta += 0.5;
 
-  const modelMatrix = Matrix4.rotateZ(theta).multiply(Matrix4.rotateX(theta));
+  const modelMatrix = Matrix4.rotateZ(theta).multiply(
+    Matrix4.rotateY(theta).multiply(Matrix4.rotateX(theta))
+  );
 
   const viewMatrix = Matrix4.lookAt(camera.eye, camera.target, camera.up);
 
