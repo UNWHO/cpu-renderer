@@ -7,7 +7,7 @@ import {
   set_uniform_matrix,
 } from "../wasm/pkg/cpu_renderer";
 import { initModel } from "./model";
-import { Matrix, Matrix4 } from "./math/matrix";
+import { Matrix4 } from "./math/matrix";
 import { Vector3 } from "./math/vector";
 import { writeFPS, writeResolution } from "./ui";
 import { initTexture } from "./texture";
